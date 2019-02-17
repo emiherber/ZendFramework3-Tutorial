@@ -58,7 +58,7 @@ class ZendDbSqlRepository implements PostRepositoryInterface {
         }
 
         $resultSet = new HydratingResultSet(
-            $this->hydrator, $this->postPrototype
+                $this->hydrator, $this->postPrototype
         );
         $resultSet->initialize($result);
         return $resultSet;
@@ -73,27 +73,26 @@ class ZendDbSqlRepository implements PostRepositoryInterface {
         $sql = new Sql($this->db);
         $select = $sql->select('posts');
         $select->where(['id = ?' => $id]);
-        
+
         $statement = $sql->prepareStatementForSqlObject($select);
-        $reult = $statement->execute();
-        
-        if(!$reult instanceof ResultInterface || !$reult->isQueryResult()){
-            throw new \RuntimeException(sprintf(
-                'Failed retrieving blog post with identifier "%s"; unknown database error.',
-                $id
+        $result = $statement->execute();
+
+        if (!$result instanceof ResultInterface || !$result->isQueryResult()) {
+            throw new RuntimeException(sprintf(
+                    'Failed retrieving blog post with identifier "%s"; unknown database error.', $id
             ));
         }
-        
+
         $resultSet = new HydratingResultSet($this->hydrator, $this->postPrototype);
-        $resultSet->initialize($resultSet);
+        $resultSet->initialize($result);
         $post = $resultSet->current();
-        
-        if(!$post){
-            throw new \InvalidArgumentException(sprintf(
-                'Blog post with identifier "%s" not found.', 
-                $id
+
+        if (!$post) {
+            throw new InvalidArgumentException(sprintf(
+                    'Blog post with identifier "%s" not found.', $id
             ));
         }
+
         return $post;
     }
 
