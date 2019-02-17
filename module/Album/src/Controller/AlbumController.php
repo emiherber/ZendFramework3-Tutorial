@@ -22,8 +22,23 @@ class AlbumController extends AbstractActionController {
     }
 
     function indexAction() {
+        //Agarra el paginador de la 
+        //tabla de álbumes:
+        $paginator = $this->table->fetchAll(true);
+        //Establecer la página actual a lo que se ha 
+        //pasado en la cadena de consulta,
+        //o a 1 si no se establece ninguno, o la 
+        //página no es válida:
+        $page = (int) $this->params()->fromQuery('page',1);
+        $page = ($page < 1 )? 1 : $page;
+        
+        $paginator->setCurrentPageNumber($page);
+        //Establecemos el número de elementos 
+        //por página en 10:
+        $paginator->setItemCountPerPage(10);
+        
         return new ViewModel([
-            'albums' => $this->table->fetchAll(),
+            'paginator' => $paginator,
             'title' => 'My albums'
         ]);
     }

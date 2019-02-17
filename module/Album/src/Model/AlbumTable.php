@@ -9,6 +9,10 @@ namespace Album\Model;
  */
 use RuntimeException;
 use Zend\Db\TableGateway\TableGatewayInterface;
+use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\Sql\Select;
+use Zend\Paginator\Adapter\DbSelect;
+use Zend\Paginator\Paginator;
 
 class AlbumTable {
 
@@ -18,10 +22,37 @@ class AlbumTable {
         $this->tableGateway = $tableGateway;
     }
 
-    function fetchAll() {
+    function fetchAll($paginated = false) {
+        if($paginated){
+            return $this->fetchPaginatedResults();
+        }
         return $this->tableGateway->select();
     }
-
+    
+    private function fetchPaginatedResults(){
+        //Crear un nuevo objeto de 
+        //selección para la tabla:
+        $select = new Select($this->tableGateway->getTable());
+        
+        //Creo un nuevo conjunto de resultados basado 
+        //en la entidad del Álbum: 
+        $resultSetPrototype = new ResultSet();
+        $resultSetPrototype->setArrayObjectPrototype(new Album());
+        
+        //Creo un nuevo objeto adaptador de paginación:
+        $paginatiorAdapter = new DbSelect(
+            //Nuestro objeto seleccionado configurado:
+            $select,
+            //El adaptador para ejecutarlo contra:
+            $this->tableGateway->getAdapter(),
+            //El conjunto de resultados para hidratar:
+            $resultSetPrototype
+        );
+        
+        $paginator = new Paginator($paginatiorAdapter);
+        return $paginator;
+    }
+    
     function getAlbum(int $id) {
         $rowset = $this->tableGateway->select(['id' => $id]);
         $row = $rowset->current();

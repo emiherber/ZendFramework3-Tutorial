@@ -12,7 +12,7 @@ $this->headTitle($title);
         <th>Artist</th>
         <th>&nbsp;</th>
     </tr>
-    <?php foreach ($albums as $album) : ?>
+    <?php foreach ($this->paginator as $album) : ?>
         <tr>
             <td><?= $this->escapeHtml($album->getTitle()) ?></td>
             <td><?= $this->escapeHtml($album->getArtist()) ?></td>
@@ -23,3 +23,15 @@ $this->headTitle($title);
         </tr>
     <?php endforeach; ?>
 </table>
+<?= $this->paginationControl(
+        //Objeto paginator
+        $this->paginator,
+        //Estilo del scrolling
+        'sliding',
+        //El parcial a usar para renderizar el control.
+        'partial/paginator',
+        //La ruta para enlazar cuando un usuario 
+        //hace clic en un enlace de control:
+        ['route' => 'album']
+    );
+?>
